@@ -16,3 +16,13 @@ services:
       - app-tier
     volumes:
       - db:/bitnami/mysql/data
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    networks:
+      - app-tier
+    volumes:
+      - .:/opt/app
