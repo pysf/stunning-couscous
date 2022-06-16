@@ -1,0 +1,18 @@
+version: "3.8"
+
+networks:
+  app-tier:
+    driver: bridge
+
+volumes:
+  db:
+
+services:
+  mysql:
+    image: docker.io/bitnami/mysql:8.0
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - app-tier
+    volumes:
+      - db:/bitnami/mysql/data
