@@ -8,20 +8,43 @@ volumes:
   db:
 
 services:
-  mysql:
-    image: docker.io/bitnami/mysql:8.0
+  # mysql:
+  #   image: docker.io/bitnami/mysql:8.0
+  #   environment:
+  #     - ALLOW_EMPTY_PASSWORD=no
+  #     - MYSQL_ROOT_PASSWORD=gHteuivwdvkew4wt
+  #     - MYSQL_PASSWORD=rkg.vwd_kew4wtv2HKE
+  #     - MYSQL_USER=stcoscos
+  #     - MYSQL_DATABASE=stunning-couscous
+  #   ports:
+  #     - 3306:3306
+  #   networks:
+  #     - app-tier
+  #   volumes:
+  #     - db:/bitnami/mysql/data
+  db:
+    image: bitnami/postgresql:14.4.0
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_PASSWORD=gHteuivwdvkew4wt
+      - POSTGRESQL_DATABASE=stunning-couscous
+    ports:
+      - 5432:5432
     networks:
       - app-tier
     volumes:
-      - db:/bitnami/mysql/data
+      - db:/bitnami/postgresql
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - POSTGRESQL_PASSWORD=gHteuivwdvkew4wt
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_DATABASE=stunning-couscous
+      - POSTGRESQL_HOST=db
     depends_on:
-      - mysql
+      - db
     networks:
       - app-tier
     volumes:
