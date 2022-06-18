@@ -50,7 +50,7 @@ func TestPartnerPepoFindBestMatch_ValidateExperience(t *testing.T) {
 	}
 
 	for _, p := range got {
-		if Contains(p.Experiences, arg2) {
+		if !Contains(p.Experiences, arg2) {
 			t.Errorf("FindBestMatch() = %v , want %q experience ", p.Experiences, arg2)
 		}
 	}
