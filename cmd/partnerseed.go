@@ -16,7 +16,7 @@ func Start() {
 
 	partners := bulkgen.GeneratePartner(locations)
 
-	partnerRepo, err := partner.NewPostgreRepo()
+	partnerRepo, err := partner.NewPartnerRepo()
 	if err != nil {
 		log.Fatal(err)
 	}

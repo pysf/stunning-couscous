@@ -56,5 +56,8 @@ func shiftLocation(l partner.Location, distance, bearing float64) partner.Locati
 	lat = math.Asin(math.Sin(lat)*math.Cos(distance/R) + math.Cos(lat)*math.Sin(distance/R)*math.Cos(brng))
 	lon += math.Atan2(math.Sin(brng)*math.Sin(distance/R)*math.Cos(lat), math.Cos(distance/R)-math.Sin(lat)*math.Sin(lat))
 
-	return partner.Location{(lat * 180 / math.Pi), (lon * 180 / math.Pi)}
+	return partner.Location{
+		Latitude:  (lat * 180 / math.Pi),
+		Longitude: (lon * 180 / math.Pi),
+	}
 }
