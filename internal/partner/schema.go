@@ -17,7 +17,7 @@ const createTableQuery = `
 const installCube = `create extension if not exists cube;`
 const installEarthdistance = `create extension if not exists earthdistance;`
 
-func applySchema(db *sql.DB) error {
+func ApplySchema(db *sql.DB) error {
 
 	tx, err := db.Begin()
 	if err != nil {

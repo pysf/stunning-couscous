@@ -13,7 +13,7 @@ func main() {
 	locations := bulkgen.GenerateRandomLocations(partner.Location{
 		Latitude:  52.51999140,
 		Longitude: 13.40497255,
-	}, 10)
+	}, 100)
 
 	partners := bulkgen.GeneratePartner(locations)
 

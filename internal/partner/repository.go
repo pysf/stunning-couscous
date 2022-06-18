@@ -14,20 +14,6 @@ type Repository interface {
 	FindBestMatch(ctx context.Context, l Location, experience string) ([]Partner, error)
 }
 
-type Partner struct {
-	ID              int
-	Rating          int
-	OperatingRadius int
-	Distance        int
-	Experiences     []string
-	Location
-}
-
-type Location struct {
-	Latitude  float64
-	Longitude float64
-}
-
 func NewPartnerRepo() (Repository, error) {
 
 	db, err := db.NewPostgreConnection()
@@ -35,23 +21,23 @@ func NewPartnerRepo() (Repository, error) {
 		return nil, fmt.Errorf("NewPostgreRepo(): failed to create psq connection %w", err)
 	}
 
-	if err = applySchema(db); err != nil {
+	if err = ApplySchema(db); err != nil {
 		return nil, err
 	}
 
-	return &partnerRepo{
-		db: db,
+	return &PartnerRepo{
+		DB: db,
 	}, nil
 }
 
-type partnerRepo struct {
-	db *sql.DB
+type PartnerRepo struct {
+	DB *sql.DB
 }
 
-func (ps partnerRepo) FindBestMatch(ctx context.Context, l Location, experience string) ([]Partner, error) {
+func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience string) ([]Partner, error) {
 
 	// earthdistance is used, https://www.postgresql.org/docs/current/earthdistance.html
-	rows, err := ps.db.QueryContext(ctx, `
+	rows, err := ps.DB.QueryContext(ctx, `
 			SELECT
 				id,
 				CAST(distance AS INT),
@@ -89,6 +75,7 @@ func (ps partnerRepo) FindBestMatch(ctx context.Context, l Location, experience 
 	if err != nil {
 		return nil, fmt.Errorf("FindBestMatch() query failed, %w", err)
 	}
+	defer rows.Close()
 
 	partners := make([]Partner, 0)
 	for rows.Next() {
@@ -99,12 +86,16 @@ func (ps partnerRepo) FindBestMatch(ctx context.Context, l Location, experience 
 		partners = append(partners, p)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("FindBestMatch() failed to extract, %w", err)
+	}
+
 	return partners, nil
 
 }
 
-func (ps partnerRepo) BulkImport(partners []Partner) error {
-	txn, err := ps.db.Begin()
+func (ps PartnerRepo) BulkImport(partners []Partner) error {
+	txn, err := ps.DB.Begin()
 	if err != nil {
 		return fmt.Errorf("BulkImport(): failed to begin tx, %w", err)
 	}
@@ -134,4 +125,18 @@ func (ps partnerRepo) BulkImport(partners []Partner) error {
 
 	return nil
 
+}
+
+type Partner struct {
+	ID              int
+	Rating          int
+	OperatingRadius int
+	Distance        int
+	Experiences     []string
+	Location
+}
+
+type Location struct {
+	Latitude  float64
+	Longitude float64
 }
