@@ -13,7 +13,7 @@ import (
 )
 
 func TestGetPartner(t *testing.T) {
-	db, tearDown := setupDB(t)
+	db, tearDown := testutils.SetupDB(t)
 	defer tearDown()
 
 	repo := partner.PartnerRepo{
@@ -48,7 +48,7 @@ func TestGetPartner(t *testing.T) {
 }
 
 func TestPartnerRepoFindBestMatch_ValidateDistance(t *testing.T) {
-	db, tearDown := setupDB(t)
+	db, tearDown := testutils.SetupDB(t)
 	defer tearDown()
 
 	baseLocation := partner.Location{
@@ -78,7 +78,7 @@ func TestPartnerRepoFindBestMatch_ValidateDistance(t *testing.T) {
 }
 
 func TestPartnerRepoFindBestMatch_ValidateExperience(t *testing.T) {
-	db, tearDown := setupDB(t)
+	db, tearDown := testutils.SetupDB(t)
 	defer tearDown()
 
 	baseLocation := partner.Location{
@@ -115,12 +115,6 @@ func Contains(s []string, str string) bool {
 	}
 
 	return false
-}
-
-func setupDB(t *testing.T) (*sql.DB, func()) {
-	db, tearDown := testutils.CreateTestDatabase(t)
-	partner.ApplySchema(db)
-	return db, tearDown
 }
 
 func seedTestPartners(t *testing.T, db *sql.DB, loc partner.Location, size int) {

@@ -16,12 +16,12 @@ func NewServer() (*Server, error) {
 	}
 
 	return &Server{
-		prtner: partnerRepo,
+		PartnerRepo: partnerRepo,
 	}, nil
 }
 
 type Server struct {
-	prtner partner.Repository
+	PartnerRepo partner.Repository
 }
 
 func (s *Server) Start() {

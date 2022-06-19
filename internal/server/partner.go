@@ -20,7 +20,7 @@ func (s *Server) GetPartner(w http.ResponseWriter, r *http.Request, ps httproute
 		return NewHttpError(err, "invalid id format", http.StatusBadRequest)
 	}
 
-	p, err := s.prtner.GetPartner(r.Context(), numId)
+	p, err := s.PartnerRepo.GetPartner(r.Context(), numId)
 	if err != nil {
 		return fmt.Errorf("GetPartner: err= %w", err)
 	}

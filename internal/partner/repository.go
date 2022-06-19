@@ -143,12 +143,12 @@ func (ps PartnerRepo) BulkImport(partners []Partner) error {
 }
 
 type Partner struct {
-	ID              int64
-	Rating          int
-	OperatingRadius int
-	Distance        int
-	Experiences     []string
-	Location
+	ID              int64    `json:"id"`
+	Rating          int      `json:"rating"`
+	OperatingRadius int      `json:"operatingRadius"`
+	Distance        int      `json:"distance"`
+	Experiences     []string `json:"experiences"`
+	Location        `json:"location"`
 }
 
 func scanRow(row sql.Row) (*Partner, error) {
@@ -169,8 +169,8 @@ func scanRow(row sql.Row) (*Partner, error) {
 }
 
 type Location struct {
-	Latitude  float64
-	Longitude float64
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 func (l *Location) parsePostgresPoint(point string) error {

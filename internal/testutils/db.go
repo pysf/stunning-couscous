@@ -6,12 +6,16 @@ import (
 	"math/rand"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/pysf/stunning-couscous/internal/db"
+	"github.com/pysf/stunning-couscous/internal/partner"
 )
 
 func CreateTestDatabase(t *testing.T) (testDB *sql.DB, tearDown func()) {
-	testDBName := fmt.Sprintf("test_db_%v", rand.Intn(10000))
+	rand.Seed(time.Now().UnixNano())
+
+	testDBName := fmt.Sprintf("test_db_%v", rand.Intn(100000))
 
 	psqDB, err := db.NewPostgreConnection("postgres")
 	if err != nil {
@@ -48,4 +52,10 @@ func CreateDatabase(t *testing.T, db *sql.DB, dbname string) {
 		}
 		t.Errorf("failed to create test database %s", err)
 	}
+}
+
+func SetupDB(t *testing.T) (*sql.DB, func()) {
+	db, tearDown := CreateTestDatabase(t)
+	partner.ApplySchema(db)
+	return db, tearDown
 }
