@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func NewPostgreConnection() (*sql.DB, error) {
+func NewPostgreConnection(dbName string) (*sql.DB, error) {
 
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -14,7 +14,7 @@ func NewPostgreConnection() (*sql.DB, error) {
 		os.Getenv("POSTGRESQL_PORT"),
 		os.Getenv("POSTGRESQL_USERNAME"),
 		os.Getenv("POSTGRESQL_PASSWORD"),
-		os.Getenv("POSTGRESQL_DATABASE"))
+		dbName)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {

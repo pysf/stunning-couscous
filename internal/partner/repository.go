@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"regexp"
 	"strconv"
 
@@ -19,7 +20,7 @@ type Repository interface {
 
 func NewPartnerRepo() (Repository, error) {
 
-	db, err := db.NewPostgreConnection()
+	db, err := db.NewPostgreConnection(os.Getenv("POSTGRESQL_DATABASE"))
 	if err != nil {
 		return nil, fmt.Errorf("NewPostgreRepo: create psq connection err= %w", err)
 	}
