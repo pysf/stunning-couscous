@@ -31,25 +31,25 @@ func ApplySchema(db *sql.DB) error {
 		if rbkErr := tx.Rollback(); rbkErr != nil {
 			return fmt.Errorf("applySchema: failed rollback install cube %w", err)
 		}
-		return fmt.Errorf("applySchema: failed install cube %w", err)
+		return fmt.Errorf("applySchema: install cube err= %w", err)
 	}
 
 	if _, err = tx.Exec(installEarthdistance); err != nil {
 		if rbkErr := tx.Rollback(); rbkErr != nil {
-			return fmt.Errorf("applySchema: failed rollback install earthdistance %w", err)
+			return fmt.Errorf("applySchema: rollback install earthdistance  err= %w", err)
 		}
-		return fmt.Errorf("applySchema: failed install earthdistance %w", err)
+		return fmt.Errorf("applySchema: install earthdistance err= %w", err)
 	}
 
 	if _, err = tx.Exec(createTableQuery); err != nil {
 		if rbkErr := tx.Rollback(); rbkErr != nil {
-			return fmt.Errorf("applySchema: failed, failde to rollback, %w", err)
+			return fmt.Errorf("applySchema:  rollback err= %w", err)
 		}
-		return fmt.Errorf("applySchema: failed to apply schema, %w", err)
+		return fmt.Errorf("applySchema: apply schema err= %w", err)
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("applySchema: failed commit applySchema, %w", err)
+		return fmt.Errorf("applySchema: Commit err= %w", err)
 	}
 
 	return nil

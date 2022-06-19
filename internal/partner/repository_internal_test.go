@@ -46,7 +46,7 @@ func TestParsePostgresPoint(t *testing.T) {
 	for i, tt := range tests {
 
 		got := &Location{}
-		err := got.ParsePostgresPoint(tt.args.point)
+		err := got.parsePostgresPoint(tt.args.point)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("case(%d): ParsePostgresPoint() error = %v, wantErr %v", i, err, tt.wantErr)
 			return

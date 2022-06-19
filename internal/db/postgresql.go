@@ -18,11 +18,11 @@ func NewPostgreConnection() (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		return nil, fmt.Errorf("NewPostgreRepo: failed to connect to postgre %w", err)
+		return nil, fmt.Errorf("NewPostgreConnection: connect to postgre err= %w", err)
 	}
 
 	if err = db.Ping(); err != nil {
-		return nil, fmt.Errorf("NewPostgreRepo: failed to ping postgre %w", err)
+		return nil, fmt.Errorf("NewPostgreConnection: ping postgre err= %w", err)
 	}
 
 	return db, nil

@@ -21,7 +21,7 @@ func NewPartnerRepo() (Repository, error) {
 
 	db, err := db.NewPostgreConnection()
 	if err != nil {
-		return nil, fmt.Errorf("NewPostgreRepo(): failed to create psq connection %w", err)
+		return nil, fmt.Errorf("NewPostgreRepo: create psq connection err= %w", err)
 	}
 
 	if err = ApplySchema(db); err != nil {
@@ -42,7 +42,7 @@ func (ps PartnerRepo) GetPartner(ctx context.Context, id int64) (*Partner, error
 
 	p, err := scanRow(*row)
 	if err != nil {
-		return nil, fmt.Errorf("GetPartner(): failed %w", err)
+		return nil, fmt.Errorf("GetPartner: scanRow err= %w", err)
 	}
 
 	return p, nil
@@ -87,7 +87,7 @@ func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience 
 		l.Latitude, l.Longitude, experience)
 
 	if err != nil {
-		return nil, fmt.Errorf("FindBestMatch() query failed, %w", err)
+		return nil, fmt.Errorf("FindBestMatch: run query err= %w", err)
 	}
 	defer rows.Close()
 
@@ -95,13 +95,13 @@ func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience 
 	for rows.Next() {
 		var p Partner
 		if err := rows.Scan(&p.ID, &p.Distance, &p.Rating, pq.Array(&p.Experiences), &p.OperatingRadius); err != nil {
-			return nil, fmt.Errorf("FindBestMatch() extract row failed, %w", err)
+			return nil, fmt.Errorf("FindBestMatch: extract row err= %w", err)
 		}
 		partners = append(partners, p)
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("FindBestMatch() failed to extract, %w", err)
+		return nil, fmt.Errorf("FindBestMatch: extract rows err= %w", err)
 	}
 
 	return partners, nil
@@ -111,30 +111,30 @@ func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience 
 func (ps PartnerRepo) BulkImport(partners []Partner) error {
 	txn, err := ps.DB.Begin()
 	if err != nil {
-		return fmt.Errorf("BulkImport(): failed to begin tx, %w", err)
+		return fmt.Errorf("BulkImport: begin tx err= %w", err)
 	}
 
 	stmt, err := txn.Prepare(pq.CopyIn("partner", "location", "experiences", "operatingradius", "rating"))
 	if err != nil {
-		return fmt.Errorf("BulkImport(): failed to prepare tx, %w", err)
+		return fmt.Errorf("BulkImport: prepare tx err= %w", err)
 	}
 
 	for _, p := range partners {
 		if _, err := stmt.Exec(fmt.Sprintf("(%v,%v)", p.Latitude, p.Longitude), pq.Array(p.Experiences), p.OperatingRadius, p.Rating); err != nil {
-			return fmt.Errorf("BulkImport(): exec, %w", err)
+			return fmt.Errorf("BulkImport: exec err= %w", err)
 		}
 	}
 
 	if _, err := stmt.Exec(); err != nil {
-		return fmt.Errorf("BulkImport(): exec finalize, %w", err)
+		return fmt.Errorf("BulkImport: exec finalize err= %w", err)
 	}
 
 	if err := stmt.Close(); err != nil {
-		return fmt.Errorf("BulkImport(): exec Close, %w", err)
+		return fmt.Errorf("BulkImport: exec Close err= %w", err)
 	}
 
 	if err := txn.Commit(); err != nil {
-		return fmt.Errorf("BulkImport(): txn Commit, %w", err)
+		return fmt.Errorf("BulkImport: txn Commit err= %w", err)
 	}
 
 	return nil
@@ -158,12 +158,12 @@ func scanRow(row sql.Row) (*Partner, error) {
 	case sql.ErrNoRows:
 		return nil, nil
 	case nil:
-		if err = p.ParsePostgresPoint(point); err != nil {
-			return nil, fmt.Errorf("scanRow(): parse point failed, %w", err)
+		if err = p.parsePostgresPoint(point); err != nil {
+			return nil, fmt.Errorf("scanRow: parse point err= %w", err)
 		}
 		return p, nil
 	default:
-		return nil, fmt.Errorf("scanRow(): failed, %w", err)
+		return nil, fmt.Errorf("scanRow: err= %w", err)
 	}
 }
 
@@ -172,7 +172,7 @@ type Location struct {
 	Longitude float64
 }
 
-func (l *Location) ParsePostgresPoint(point string) error {
+func (l *Location) parsePostgresPoint(point string) error {
 
 	rgx := regexp.MustCompile(`([\d\.]+),([\d\.]+)`)
 	res := rgx.FindStringSubmatch(point)
@@ -183,12 +183,12 @@ func (l *Location) ParsePostgresPoint(point string) error {
 
 	lat, err := strconv.ParseFloat(res[1], 64)
 	if err != nil {
-		return fmt.Errorf("parsePostgresPoint() latitude err=%w ", err)
+		return fmt.Errorf("parsePostgresPoint: parse latitude err= %w ", err)
 	}
 
 	lng, err := strconv.ParseFloat(res[2], 64)
 	if err != nil {
-		return fmt.Errorf("parsePostgresPoint() longitude err=%w ", err)
+		return fmt.Errorf("parsePostgresPoint: parse longitude err= %w ", err)
 	}
 
 	l.Latitude = lat
