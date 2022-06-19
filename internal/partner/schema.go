@@ -7,7 +7,7 @@ import (
 
 const createTableQuery = `
 	CREATE TABLE IF NOT EXISTS partner (
-		id serial PRIMARY KEY,
+		id BIGSERIAL NOT NULL PRIMARY KEY,
 		experiences varchar[],
 		operatingradius int,
 		rating int,
@@ -23,6 +23,9 @@ func ApplySchema(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+
+	//todo: add index for id
+	//todo: add index for location experience
 
 	if _, err = tx.Exec(installCube); err != nil {
 		if rbkErr := tx.Rollback(); rbkErr != nil {

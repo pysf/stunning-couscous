@@ -19,12 +19,12 @@ func CreateTestDatabase(t *testing.T) (testDB *sql.DB, tearDown func()) {
 
 	tearDown = func() {
 		if err := testDB.Close(); err != nil {
-			t.Logf("failed to close connection to test database: %s", err)
+			t.Logf("failed to close connection to %v database: %s", testDBName, err)
 		}
 
 		_, err := db.Exec(fmt.Sprintf("drop database %v", testDBName))
 		if err != nil {
-			t.Logf("teardown test database failed: %s", err)
+			t.Logf("teardown %v database failed: %s", testDBName, err)
 		}
 		db.Close()
 	}

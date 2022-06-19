@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"regexp"
+	"strconv"
 
 	"github.com/lib/pq"
 	"github.com/pysf/stunning-couscous/internal/db"
@@ -11,7 +13,8 @@ import (
 
 type Repository interface {
 	BulkImport([]Partner) error
-	FindBestMatch(ctx context.Context, l Location, experience string) ([]Partner, error)
+	FindBestMatch(context.Context, Location, string) ([]Partner, error)
+	GetPartner(context.Context, int64) (*Partner, error)
 }
 
 func NewPartnerRepo() (Repository, error) {
@@ -32,6 +35,17 @@ func NewPartnerRepo() (Repository, error) {
 
 type PartnerRepo struct {
 	DB *sql.DB
+}
+
+func (ps PartnerRepo) GetPartner(ctx context.Context, id int64) (*Partner, error) {
+	row := ps.DB.QueryRow(`SELECT * FROM partner WHERE ID=$1`, id)
+
+	p, err := scanRow(*row)
+	if err != nil {
+		return nil, fmt.Errorf("GetPartner(): failed %w", err)
+	}
+
+	return p, nil
 }
 
 func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience string) ([]Partner, error) {
@@ -128,7 +142,7 @@ func (ps PartnerRepo) BulkImport(partners []Partner) error {
 }
 
 type Partner struct {
-	ID              int
+	ID              int64
 	Rating          int
 	OperatingRadius int
 	Distance        int
@@ -136,7 +150,48 @@ type Partner struct {
 	Location
 }
 
+func scanRow(row sql.Row) (*Partner, error) {
+	p := &Partner{}
+	var point string
+	err := row.Scan(&p.ID, pq.Array(&p.Experiences), &p.OperatingRadius, &p.Rating, &point)
+	switch err {
+	case sql.ErrNoRows:
+		return nil, nil
+	case nil:
+		if err = p.ParsePostgresPoint(point); err != nil {
+			return nil, fmt.Errorf("scanRow(): parse point failed, %w", err)
+		}
+		return p, nil
+	default:
+		return nil, fmt.Errorf("scanRow(): failed, %w", err)
+	}
+}
+
 type Location struct {
 	Latitude  float64
 	Longitude float64
+}
+
+func (l *Location) ParsePostgresPoint(point string) error {
+
+	rgx := regexp.MustCompile(`([\d\.]+),([\d\.]+)`)
+	res := rgx.FindStringSubmatch(point)
+
+	if len(res) != 3 {
+		return nil
+	}
+
+	lat, err := strconv.ParseFloat(res[1], 64)
+	if err != nil {
+		return fmt.Errorf("parsePostgresPoint() latitude err=%w ", err)
+	}
+
+	lng, err := strconv.ParseFloat(res[2], 64)
+	if err != nil {
+		return fmt.Errorf("parsePostgresPoint() longitude err=%w ", err)
+	}
+
+	l.Latitude = lat
+	l.Longitude = lng
+	return nil
 }
