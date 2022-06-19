@@ -1,28 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"github.com/pysf/stunning-couscous/internal/bulkgen"
-	"github.com/pysf/stunning-couscous/internal/partner"
+	"github.com/pysf/stunning-couscous/internal/server"
 )
 
 func main() {
-
-	locations := bulkgen.GenerateRandomLocations(partner.Location{
-		Latitude:  52.51999140,
-		Longitude: 13.40497255,
-	}, 100)
-
-	partners := bulkgen.GeneratePartner(locations)
-
-	partnerRepo, err := partner.NewPartnerRepo()
+	server, err := server.NewServer()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Server failde to start %s", err)
 	}
-
-	partnerRepo.BulkImport(partners)
-	fmt.Println("hello.. to you!")
-
+	server.Start()
 }
