@@ -27,33 +27,33 @@ func TestParsePostgresPoint(t *testing.T) {
 			args: args{
 				point: `(52.528971849007036,)`,
 			},
-			want: nil,
+			want: &Location{},
 		},
 		{
 			args: args{
 				point: `()`,
 			},
-			want: nil,
+			want: &Location{},
 		},
 		{
 			args: args{
 				point: ``,
 			},
-			want: nil,
+			want: &Location{},
 		},
 	}
 
-	for _, tt := range tests {
+	for i, tt := range tests {
 
 		got := &Location{}
 		err := got.ParsePostgresPoint(tt.args.point)
 		if (err != nil) != tt.wantErr {
-			t.Errorf("ParsePostgresPoint() error = %v, wantErr %v", err, tt.wantErr)
+			t.Errorf("case(%d): ParsePostgresPoint() error = %v, wantErr %v", i, err, tt.wantErr)
 			return
 		}
 
 		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("ParsePostgresPoint() = %v, want %v", got, tt.want)
+			t.Errorf("case(%d): ParsePostgresPoint() = %v, want %v", i, got, tt.want)
 		}
 
 	}
