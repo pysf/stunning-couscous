@@ -25,7 +25,7 @@ func ApplySchema(db *sql.DB) error {
 	}
 
 	//todo: add index for id
-	//todo: add index for location experience
+	//todo: add index for location and experience
 
 	if _, err = tx.Exec(installCube); err != nil {
 		if rbkErr := tx.Rollback(); rbkErr != nil {

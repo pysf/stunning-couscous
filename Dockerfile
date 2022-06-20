@@ -7,7 +7,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go test -v
 RUN go build -o /stunning-couscous
 
 FROM gcr.io/distroless/base-debian10

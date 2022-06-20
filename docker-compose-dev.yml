@@ -1,7 +1,7 @@
 version: "3.8"
 
 networks:
-  app-tier:
+  app-tier-dev:
     driver: bridge
 
 volumes:
@@ -16,7 +16,7 @@ services:
     ports:
       - 5432:5432
     networks:
-      - app-tier
+      - app-tier-dev
     volumes:
       - dbdev:/bitnami/postgresql
   appdev:
@@ -34,6 +34,6 @@ services:
     depends_on:
       - dbdev
     networks:
-      - app-tier
+      - app-tier-dev
     volumes:
       - .:/opt/app

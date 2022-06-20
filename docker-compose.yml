@@ -1,7 +1,7 @@
 version: "3.8"
 
 networks:
-  app-tier:
+  app-tier-demo:
     driver: bridge
 
 volumes:
@@ -16,7 +16,7 @@ services:
     ports:
       - 5432:5432
     networks:
-      - app-tier
+      - app-tier-demo
     volumes:
       - dbdemo:/bitnami/postgresql
   appdemo:
@@ -33,6 +33,6 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - app-tier
+      - app-tier-demo
     volumes:
       - .:/opt/app
