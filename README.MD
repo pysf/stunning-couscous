@@ -5,7 +5,7 @@
 - Having Docker and Docker Compose installed
 - To test the APIs you need to seed the database with seeder CLI, because the database is empty.
 
-## Start Development
+## Start
 
 To start the app in development mode run:
 
