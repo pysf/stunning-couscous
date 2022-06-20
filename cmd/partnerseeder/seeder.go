@@ -21,7 +21,7 @@ func main() {
 	cliArgs := seederArgs{}
 
 	latPrompt := promptui.Prompt{
-		Label: "Let's generate some partner around a custom location. Do you have any latitude in mind?",
+		Label: "Let's find some partners around a custom location. What latitude are you considering?",
 		Validate: func(input string) error {
 			if _, err := strconv.ParseFloat(input, 64); err != nil {
 				return fmt.Errorf("invalid latitude: %w", err)
@@ -38,7 +38,7 @@ func main() {
 	cliArgs.Latitude = lat
 
 	lngPrompt := promptui.Prompt{
-		Label: "What about longitude?",
+		Label: "And what about longitude?",
 		Validate: func(input string) error {
 			if _, err := strconv.ParseFloat(input, 64); err != nil {
 				return fmt.Errorf("invalid longitude: %w", err)
@@ -55,7 +55,7 @@ func main() {
 	cliArgs.Longitude = lng
 
 	sizePrompt := promptui.Prompt{
-		Label: "How many partner do you want to generate?",
+		Label: "How many partners do you want?",
 		Validate: func(input string) error {
 			if _, err := strconv.ParseInt(input, 10, 32); err != nil {
 				return fmt.Errorf("invalid size: %w", err)
@@ -72,7 +72,7 @@ func main() {
 	cliArgs.Size = size
 
 	databaseAddressPrompt := promptui.Prompt{
-		Label: "I need to know Postgre IP?",
+		Label: "What is the Postgre IP address?",
 		Validate: func(input string) error {
 			if ip := net.ParseIP(input); ip == nil {
 				return fmt.Errorf("invalid ip")
@@ -89,7 +89,7 @@ func main() {
 	cliArgs.IP = databeseIP
 
 	databasePortPrompt := promptui.Prompt{
-		Label: "And Postgre Port?",
+		Label: "What is the Postgre port number?",
 		Validate: func(input string) error {
 			if _, err := strconv.ParseInt(input, 10, 32); err != nil {
 				return fmt.Errorf("invalid Port: %w", err)
@@ -106,7 +106,7 @@ func main() {
 	cliArgs.Port = databesePort
 
 	databaseNamePrompt := promptui.Prompt{
-		Label: "Do you have any suggestion for DB name? (Be aware that changing this would affect the main app!)",
+		Label: "Can you suggest a name for the database? (Please be aware that changing this will impact the main app!)",
 		Validate: func(input string) error {
 			if len(input) == 0 {
 				return fmt.Errorf("invalid db name")
@@ -123,7 +123,7 @@ func main() {
 	cliArgs.DB = databeseName
 
 	usernamePrompt := promptui.Prompt{
-		Label: "Pass me the database credentials please, Username? ",
+		Label: "May I have the database credentials, Username?",
 		Validate: func(input string) error {
 			if len(input) == 0 {
 				return fmt.Errorf("username can not be empty")
@@ -140,7 +140,7 @@ func main() {
 	cliArgs.Username = username
 
 	passwordPrompt := promptui.Prompt{
-		Label:   "And what is password? ",
+		Label:   "Also, what is the password?",
 		Default: "gHteuivwdvkew4wt",
 	}
 
