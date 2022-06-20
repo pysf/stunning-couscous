@@ -5,10 +5,10 @@ networks:
     driver: bridge
 
 volumes:
-  db:
+  dbdemo:
 
 services:
-  db:
+  dbdemo:
     image: bitnami/postgresql:14.4.0
     environment:
       - POSTGRESQL_PASSWORD=gHteuivwdvkew4wt
@@ -18,8 +18,8 @@ services:
     networks:
       - app-tier
     volumes:
-      - db:/bitnami/postgresql
-  app:
+      - dbdemo:/bitnami/postgresql
+  appdemo:
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,11 +28,12 @@ services:
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_PORT=5432
       - POSTGRESQL_DATABASE=stunning-couscous
-      - POSTGRESQL_HOST=db
+      - POSTGRESQL_HOST=dbdemo
+    restart: always
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - dbdemo
     networks:
       - app-tier
     volumes:

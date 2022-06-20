@@ -1,7 +1,19 @@
-FROM golang:1.18
+FROM golang:1.18-buster AS build
 
-RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s
+WORKDIR /app
 
-WORKDIR /opt/app
+COPY go.mod ./
+RUN go mod download
 
-CMD [ "air" ]
+COPY . .
+
+RUN go test -v
+RUN go build -o /stunning-couscous
+
+FROM gcr.io/distroless/base-debian10
+
+WORKDIR /
+
+COPY --from=build /stunning-couscous /stunning-couscous
+
+ENTRYPOINT ["/stunning-couscous"]
