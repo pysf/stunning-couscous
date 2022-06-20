@@ -32,8 +32,6 @@ services:
     restart: always
     ports:
       - "8080:8080"
-    depends_on:
-      - dbdemo
     networks:
       - app-tier
     volumes:
