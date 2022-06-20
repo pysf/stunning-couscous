@@ -1,0 +1,82 @@
+{
+	"info": {
+		"_postman_id": "39b277b2-c1d1-470b-9b11-122e3b36a3aa",
+		"name": "stunning-couscous",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14834296"
+	},
+	"item": [
+		{
+			"name": "Find Best Partner",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8080/api/search/partner/best-match?material=carpet&latitude=52.49304178513987&longitude=13.40497255&phone=1123456789&square=70",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"search",
+						"partner",
+						"best-match"
+					],
+					"query": [
+						{
+							"key": "material",
+							"value": "carpet"
+						},
+						{
+							"key": "latitude",
+							"value": "52.49304178513987"
+						},
+						{
+							"key": "longitude",
+							"value": "13.40497255",
+							"description": "\n"
+						},
+						{
+							"key": "phone",
+							"value": "1123456789"
+						},
+						{
+							"key": "square",
+							"value": "70"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Partner",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8080/api/partner/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"partner",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
