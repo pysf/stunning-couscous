@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pysf/stunning-couscous/internal/bulkgen"
 	"github.com/pysf/stunning-couscous/internal/db"
 	"github.com/pysf/stunning-couscous/internal/partner"
 )
@@ -58,4 +59,17 @@ func SetupDB(t *testing.T) (*sql.DB, func()) {
 	db, tearDown := CreateTestDatabase(t)
 	partner.ApplySchema(db)
 	return db, tearDown
+}
+
+func SeedTestPartners(t *testing.T, db *sql.DB, loc partner.Location, size int) {
+
+	locations := bulkgen.GenerateRandomLocations(loc, size)
+	partners := bulkgen.GeneratePartner(locations)
+
+	partnerRepo := partner.PartnerRepo{
+		DB: db,
+	}
+
+	partnerRepo.BulkImport(partners)
+
 }

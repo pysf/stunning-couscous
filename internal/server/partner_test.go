@@ -2,6 +2,7 @@ package server_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -80,5 +81,111 @@ func TestServer_GetPartner(t *testing.T) {
 		if !reflect.DeepEqual(tt.want, got) {
 			t.Fatalf("Server.GetPartner() = %v; want = %v", got, tt.want)
 		}
+	}
+}
+
+func TestServer_FindBestMatch(t *testing.T) {
+	db, tearDown := testutils.SetupDB(t)
+	defer tearDown()
+
+	baseLoc := partner.Location{
+		Latitude:  52.51999140,
+		Longitude: 13.40497255,
+	}
+	testutils.SeedTestPartners(t, db, baseLoc, 100)
+
+	tests := []struct {
+		name        string
+		PartnerRepo partner.Repository
+		w           *httptest.ResponseRecorder
+		r           *http.Request
+		ps          httprouter.Params
+		query       map[string]string
+		wantErr     bool
+	}{
+		{
+			name: "Success",
+			PartnerRepo: partner.PartnerRepo{
+				DB: db,
+			},
+			w:  httptest.NewRecorder(),
+			r:  httptest.NewRequest("GET", "/api/search/partner/best-match", nil),
+			ps: httprouter.Params{},
+			query: map[string]string{
+				"material":  "wood",
+				"latitude":  fmt.Sprintf("%f", baseLoc.Latitude),
+				"longitude": fmt.Sprintf("%f", baseLoc.Longitude),
+				"phone":     "1123456789",
+				"square":    "10",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Validate material required",
+			PartnerRepo: partner.PartnerRepo{
+				DB: db,
+			},
+			w:  httptest.NewRecorder(),
+			r:  httptest.NewRequest("GET", "/api/search/partner/best-match", nil),
+			ps: httprouter.Params{},
+			query: map[string]string{
+				"latitude":  fmt.Sprintf("%f", baseLoc.Latitude),
+				"longitude": fmt.Sprintf("%f", baseLoc.Longitude),
+				"phone":     "1123456789",
+				"square":    "10",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Validate latitude required",
+			PartnerRepo: partner.PartnerRepo{
+				DB: db,
+			},
+			w:  httptest.NewRecorder(),
+			r:  httptest.NewRequest("GET", "/api/search/partner/best-match", nil),
+			ps: httprouter.Params{},
+			query: map[string]string{
+				"material":  "wood",
+				"longitude": fmt.Sprintf("%f", baseLoc.Longitude),
+				"phone":     "1123456789",
+				"square":    "10",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Validate longitude required",
+			PartnerRepo: partner.PartnerRepo{
+				DB: db,
+			},
+			w:  httptest.NewRecorder(),
+			r:  httptest.NewRequest("GET", "/api/search/partner/best-match", nil),
+			ps: httprouter.Params{},
+			query: map[string]string{
+				"material": "wood",
+				"latitude": fmt.Sprintf("%f", baseLoc.Latitude),
+				"phone":    "1123456789",
+				"square":   "10",
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &server.Server{
+				PartnerRepo: tt.PartnerRepo,
+			}
+
+			q := tt.r.URL.Query()
+			for k, v := range tt.query {
+				q.Add(k, v)
+			}
+			tt.r.URL.RawQuery = q.Encode()
+
+			if err := s.FindBestMatch(tt.w, tt.r, tt.ps); (err != nil) != tt.wantErr {
+				t.Errorf("Server.FindBestMatch() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+		})
 	}
 }

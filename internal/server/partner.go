@@ -46,20 +46,20 @@ func (s *Server) GetPartner(w http.ResponseWriter, r *http.Request, ps httproute
 
 func (s *Server) FindBestMatch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) error {
 
-	bestMatch := BestMatchRequest{}
-	FillBestMatch(r.URL.Query(), &bestMatch)
+	bestMatchReq := BestMatchRequest{}
+	FillBestMatch(r.URL.Query(), &bestMatchReq)
 
-	if err := validator.New().Struct(bestMatch); err != nil {
+	if err := validator.New().Struct(bestMatchReq); err != nil {
 		return NewHttpError(nil, err.Error(), http.StatusBadRequest)
 	}
 
 	l := partner.Location{}
-	if err := partner.FillLocation(bestMatch.Latitude, bestMatch.Longitude, &l); err != nil {
+	if err := partner.FillLocation(bestMatchReq.Latitude, bestMatchReq.Longitude, &l); err != nil {
 		return fmt.Errorf("FillLocation: err= %w ", err)
 	}
 
 	// Query pagination is not implemented because it was not asked, but can be add easily
-	partners, err := s.PartnerRepo.FindBestMatch(r.Context(), l, bestMatch.Material)
+	partners, err := s.PartnerRepo.FindBestMatch(r.Context(), l, bestMatchReq.Material)
 	if err != nil {
 		return fmt.Errorf("PartnerRepo.FindBestMatch: err=%w", err)
 	}

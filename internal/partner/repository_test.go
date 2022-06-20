@@ -2,12 +2,10 @@ package partner_test
 
 import (
 	"context"
-	"database/sql"
 	"reflect"
 	"testing"
 
 	"github.com/lib/pq"
-	"github.com/pysf/stunning-couscous/internal/bulkgen"
 	"github.com/pysf/stunning-couscous/internal/partner"
 	"github.com/pysf/stunning-couscous/internal/testutils"
 )
@@ -55,7 +53,7 @@ func TestPartnerRepoFindBestMatch_ValidateDistance(t *testing.T) {
 		Latitude:  52.51999140,
 		Longitude: 13.40497255,
 	}
-	seedTestPartners(t, db, baseLocation, 300)
+	testutils.SeedTestPartners(t, db, baseLocation, 300)
 
 	repo := partner.PartnerRepo{
 		DB: db,
@@ -85,7 +83,7 @@ func TestPartnerRepoFindBestMatch_ValidateExperience(t *testing.T) {
 		Latitude:  52.51999140,
 		Longitude: 13.40497255,
 	}
-	seedTestPartners(t, db, baseLocation, 300)
+	testutils.SeedTestPartners(t, db, baseLocation, 300)
 
 	repo := partner.PartnerRepo{
 		DB: db,
@@ -115,17 +113,4 @@ func Contains(s []string, str string) bool {
 	}
 
 	return false
-}
-
-func seedTestPartners(t *testing.T, db *sql.DB, loc partner.Location, size int) {
-
-	locations := bulkgen.GenerateRandomLocations(loc, size)
-	partners := bulkgen.GeneratePartner(locations)
-
-	partnerRepo := partner.PartnerRepo{
-		DB: db,
-	}
-
-	partnerRepo.BulkImport(partners)
-
 }
