@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"log"
+
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -62,13 +63,13 @@ func wrapWithErrorHandler(fn func(http.ResponseWriter, *http.Request, httprouter
 
 		clientErr, ok := err.(ClientError)
 		if !ok {
+			log.Printf("An error occured err= %s", err)
 			http.Error(w, "Unexpected error!", http.StatusInternalServerError)
 			return
 		}
 
 		b, err := clientErr.ResponseBody()
 		if err != nil {
-			log.Printf("wrapHandler: An error accured: %v", err)
 			w.WriteHeader(500)
 			return
 		}

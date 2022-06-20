@@ -14,7 +14,7 @@ import (
 
 type Repository interface {
 	BulkImport([]Partner) error
-	FindBestMatch(context.Context, Location, string) ([]Partner, error)
+	FindBestMatch(ctx context.Context, loc Location, experience string) ([]Partner, error)
 	GetPartner(context.Context, int64) (*Partner, error)
 }
 
@@ -41,12 +41,12 @@ type PartnerRepo struct {
 func (ps PartnerRepo) GetPartner(ctx context.Context, id int64) (*Partner, error) {
 	row := ps.DB.QueryRow(`SELECT * FROM partner WHERE ID=$1`, id)
 
-	p, err := scanRow(*row)
-	if err != nil {
+	p := Partner{}
+	if err := scanRow(*row, &p); err != nil {
 		return nil, fmt.Errorf("GetPartner: scanRow err= %w", err)
 	}
 
-	return p, nil
+	return &p, nil
 }
 
 func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience string) ([]Partner, error) {
@@ -58,7 +58,8 @@ func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience 
 				CAST(distance AS INT),
 				rating,
 				experiences,
-				operatingradius
+				operatingradius,
+				location
 			FROM (
 				SELECT
 					id,
@@ -95,9 +96,15 @@ func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience 
 	partners := make([]Partner, 0)
 	for rows.Next() {
 		var p Partner
-		if err := rows.Scan(&p.ID, &p.Distance, &p.Rating, pq.Array(&p.Experiences), &p.OperatingRadius); err != nil {
+		var point string
+		if err := rows.Scan(&p.ID, &p.Distance, &p.Rating, pq.Array(&p.Experiences), &p.OperatingRadius, &point); err != nil {
 			return nil, fmt.Errorf("FindBestMatch: extract row err= %w", err)
 		}
+
+		if err = p.parsePostgresPoint(point); err != nil {
+			return nil, fmt.Errorf("scanRow: parse point err= %w", err)
+		}
+
 		partners = append(partners, p)
 	}
 
@@ -151,26 +158,43 @@ type Partner struct {
 	Location        `json:"location"`
 }
 
-func scanRow(row sql.Row) (*Partner, error) {
-	p := &Partner{}
+func scanRow(row sql.Row, p *Partner) error {
+
 	var point string
 	err := row.Scan(&p.ID, pq.Array(&p.Experiences), &p.OperatingRadius, &p.Rating, &point)
 	switch err {
 	case sql.ErrNoRows:
-		return nil, nil
+		return nil
 	case nil:
 		if err = p.parsePostgresPoint(point); err != nil {
-			return nil, fmt.Errorf("scanRow: parse point err= %w", err)
+			return fmt.Errorf("scanRow: parse point err= %w", err)
 		}
-		return p, nil
+		return nil
 	default:
-		return nil, fmt.Errorf("scanRow: err= %w", err)
+		return fmt.Errorf("scanRow: err= %w", err)
 	}
 }
 
 type Location struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
+}
+
+func FillLocation(lat, lng string, l *Location) error {
+	latitude, err := strconv.ParseFloat(lat, 64)
+	if err != nil {
+		return fmt.Errorf("FillLocation: latitude err=%w", err)
+	}
+
+	longitude, err := strconv.ParseFloat(lng, 64)
+	if err != nil {
+		return fmt.Errorf("FillLocation: longitude err=%w", err)
+	}
+
+	l.Latitude = latitude
+	l.Longitude = longitude
+
+	return nil
 }
 
 func (l *Location) parsePostgresPoint(point string) error {

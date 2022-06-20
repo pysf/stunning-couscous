@@ -28,7 +28,9 @@ func (s *Server) Start() {
 
 	router := httprouter.New()
 
+	router.GET("/api/search/partner/best-match", wrapWithErrorHandler(s.FindBestMatch))
 	router.GET("/api/partner/:id", wrapWithErrorHandler(s.GetPartner))
+
 	fmt.Println("Starting...")
 	log.Fatal(http.ListenAndServe(":8080", router))
 
