@@ -1,14 +1,15 @@
 version: "3.8"
 
 networks:
-  app-tier-demo:
+  app-tier:
     driver: bridge
 
 volumes:
-  dbdemo:
+  db:
 
 services:
-  dbdemo:
+  db:
+    container_name: db
     image: bitnami/postgresql:14.4.0
     environment:
       - POSTGRESQL_PASSWORD=gHteuivwdvkew4wt
@@ -16,10 +17,11 @@ services:
     ports:
       - 5432:5432
     networks:
-      - app-tier-demo
+      - app-tier
     volumes:
-      - dbdemo:/bitnami/postgresql
-  appdemo:
+      - db:/bitnami/postgresql
+  api:
+    container_name: api
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,11 +30,10 @@ services:
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_PORT=5432
       - POSTGRESQL_DATABASE=stunning-couscous
-      - POSTGRESQL_HOST=dbdemo
-    restart: always
+      - POSTGRESQL_HOST=db
     ports:
       - "8080:8080"
     networks:
-      - app-tier-demo
+      - app-tier
     volumes:
       - .:/opt/app

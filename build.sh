@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+docker build -t partnerapi -f Dockerfile.prod .
+
 go mod download
 go build -o ./cmd/stunning-couscous
 

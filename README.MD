@@ -5,13 +5,13 @@
 - Docker and Docker Compose installed
 - To test the APIs you need to seed the database with seeder CLI, because the database is empty.
 
-## Start Demo
+## Start Development
 
-To start the app in demo mode run:
+To start the app in development mode run:
 
 ```sh
 cd PROGECT_DIRECTORY
-docker compose -f ./docker-compose.yml up
+docker compose up
 ```
 
 Info:
@@ -30,9 +30,26 @@ To run tests:
 
 ```sh
 # start the database
-docker compose -f ./docker-compose-dev.yml up dbdev
+docker compose up db
 cd PROGECT_DIRECTORY
 ./test.sh
+```
+
+---
+
+## Build
+
+Build script:
+
+- Creates a ready to use docker image for production
+- Creates binary seeder cli
+- Creates partnerapi binary file to use
+
+To run the script:
+
+```sh
+cd PROGECT_DIRECTORY
+./build.sh
 ```
 
 ---
@@ -40,38 +57,14 @@ cd PROGECT_DIRECTORY
 ## Seeder
 
 The seeder CLI generates random partners and writes them to the database.
-
-To build seeder run:
+Make sure the database is up and running then run the seeder:
 
 ```sh
 cd PROGECT_DIRECTORY
-./build.sh
-```
-
-Make sure the database is up and running then to run seeder:
-
-```
 ./cmd/seeder
 ```
 
 ---
-
-## Start Development
-
-To start development run:
-
-```sh
-cd PROGECT_DIRECTORY
-docker compose -f ./docker-compose-dev.yml up
-```
-
-Info:
-
-- RestAPI: 127.0.0.1:8080
-- PostgreDB: 127.0.0.1:5432
-- POSTGRESQL PASSWORD=gHteuivwdvkew4wt
-- POSTGRESQL USERNAME=postgres
-- POSTGRESQL DATABASE=stunning-couscous
 
 ## Postman collectin
 
