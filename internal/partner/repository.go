@@ -41,12 +41,12 @@ type PartnerRepo struct {
 func (ps PartnerRepo) GetPartner(ctx context.Context, id int64) (*Partner, error) {
 	row := ps.DB.QueryRow(`SELECT * FROM partner WHERE ID=$1`, id)
 
-	p := Partner{}
-	if err := scanRow(*row, &p); err != nil {
+	p, err := scanRow(*row)
+	if err != nil {
 		return nil, fmt.Errorf("GetPartner: scanRow err= %w", err)
 	}
 
-	return &p, nil
+	return p, nil
 }
 
 func (ps PartnerRepo) FindBestMatch(ctx context.Context, l Location, experience string) ([]Partner, error) {
@@ -158,20 +158,21 @@ type Partner struct {
 	Location        `json:"location"`
 }
 
-func scanRow(row sql.Row, p *Partner) error {
+func scanRow(row sql.Row) (*Partner, error) {
 
+	p := &Partner{}
 	var point string
 	err := row.Scan(&p.ID, pq.Array(&p.Experiences), &p.OperatingRadius, &p.Rating, &point)
 	switch err {
 	case sql.ErrNoRows:
-		return nil
+		return nil, nil
 	case nil:
 		if err = p.parsePostgresPoint(point); err != nil {
-			return fmt.Errorf("scanRow: parse point err= %w", err)
+			return nil, fmt.Errorf("scanRow: parse point err= %w", err)
 		}
-		return nil
+		return p, nil
 	default:
-		return fmt.Errorf("scanRow: err= %w", err)
+		return nil, fmt.Errorf("scanRow: err= %w", err)
 	}
 }
 
