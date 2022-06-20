@@ -2,7 +2,7 @@
 
 ## Requirment & Considerations
 
-- Docker and Docker Compose installed
+- Having Docker and Docker Compose installed
 - To test the APIs you need to seed the database with seeder CLI, because the database is empty.
 
 ## Start Development
@@ -11,6 +11,9 @@ To start the app in development mode run:
 
 ```sh
 cd PROGECT_DIRECTORY
+```
+
+```sh
 docker compose up
 ```
 
@@ -31,7 +34,13 @@ To run tests:
 ```sh
 # start the database
 docker compose up db
+```
+
+```sh
 cd PROGECT_DIRECTORY
+```
+
+```sh
 ./test.sh
 ```
 
@@ -49,6 +58,10 @@ To run the script:
 
 ```sh
 cd PROGECT_DIRECTORY
+
+```
+
+```sh
 ./build.sh
 ```
 
@@ -61,6 +74,9 @@ Make sure the database is up and running then run the seeder:
 
 ```sh
 cd PROGECT_DIRECTORY
+```
+
+```sh
 ./cmd/seeder
 ```
 
