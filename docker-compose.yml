@@ -1,0 +1,39 @@
+version: "3.8"
+
+networks:
+  app-tier:
+    driver: bridge
+
+volumes:
+  db:
+
+services:
+  db:
+    container_name: db
+    image: bitnami/postgresql:14.4.0
+    environment:
+      - POSTGRESQL_PASSWORD=gHteuivwdvkew4wt
+      - POSTGRESQL_DATABASE=stunning-couscous
+    ports:
+      - 5432:5432
+    networks:
+      - app-tier
+    volumes:
+      - db:/bitnami/postgresql
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRESQL_PASSWORD=gHteuivwdvkew4wt
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_DATABASE=stunning-couscous
+      - POSTGRESQL_HOST=db
+    ports:
+      - "8080:8080"
+    networks:
+      - app-tier
+    volumes:
+      - .:/opt/app
